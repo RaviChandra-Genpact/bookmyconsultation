@@ -34,15 +34,15 @@ public class AppointmentService {
 		// Validate appointment details
 		ValidationUtils.validate(appointment);
 
-		if(!userRepository.checkUserIsExistsOrNot(appointment.getUserId())) {
-			throw new InvalidInputException("User is not available with the userId :"+appointment.getUserId());
+		if(!userRepository.checkUserIsExistsOrNot(appointment.getUserEmailId())) {
+			throw new InvalidInputException("User is not available with the email :"+appointment.getUserEmailId());
 		}
 		
 		if(!doctorRepository.checkUserIsExistsOrNot(appointment.getDoctorId())) {
 			throw new InvalidInputException("Doctor is not available with the doctorId :"+appointment.getDoctorId());
 		}
 		
-		if (appointmentRepository.checkUserExistsByDoctorIdAndAppointmentDateAndTimeSlot(appointment.getUserId(),
+		if (appointmentRepository.checkUserExistsByDoctorIdAndAppointmentDateAndTimeSlot(appointment.getUserEmailId(),
 				appointment.getAppointmentDate(), appointment.getTimeSlot())) {
 			throw new SlotUnavailableException("User is having another appointment for the same timeslot");
 		}
@@ -63,8 +63,8 @@ public class AppointmentService {
 		return optionalAppointment.orElseThrow(() -> new ResourceUnAvailableException("Appointment not found"));
 	}
 
-	public List<Appointment> getAppointmentsForUser(String userId) {
-		return appointmentRepository.findByUserId(userId);
+	public List<Appointment> getAppointmentsForUser(String emailId) {
+		return appointmentRepository.findByEmailId(emailId);
 	}
 
 }

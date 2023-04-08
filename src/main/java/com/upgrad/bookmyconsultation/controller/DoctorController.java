@@ -40,7 +40,7 @@ public class DoctorController {
 		return ResponseEntity.ok(service.getAllDoctorsWithFilters(speciality));
 	}
 
-	@PostMapping("/add")
+	@PostMapping
 	public ResponseEntity<Doctor> registerDoctor(@RequestBody Doctor doctor) throws InvalidInputException {
 		if(Objects.isNull(doctor)) {
 			 throw new InvalidInputException("Doctor object is required");
@@ -60,7 +60,7 @@ public class DoctorController {
 	public ResponseEntity<TimeSlot> getTimeSlots(@RequestParam(value = "date", required = false) String date,
 	                                             @PathVariable String doctorId) {
 		if (!ValidationUtils.isValidFutureDate(date)) {
-			throw new InvalidParameterException("Not a valid date");
+			throw new InvalidParameterException("Not a valid date, date should be in yyyy-MM-dd and also it should be a future date");
 		}
 
 		if (service.getDoctor(doctorId) == null) throw new InvalidParameterException("Not a valid doctor id");

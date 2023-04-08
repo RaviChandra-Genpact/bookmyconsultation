@@ -23,7 +23,7 @@ public class AppointmentController {
 	@Autowired
 	private AppointmentService appointmentService;
 
-	@PostMapping("/v1/appointment")
+	@PostMapping
 	public ResponseEntity<BookMyConsultaionResponse> bookAppointment(@RequestBody Appointment appointment) throws InvalidInputException {
 	    if (Objects.isNull(appointment)) {
 	        throw new InvalidInputException("Invalid request body");
@@ -32,7 +32,7 @@ public class AppointmentController {
 	    return ResponseEntity.ok(new BookMyConsultaionResponse("Appointment booked successfully", "SUCCESS", appointmentObj));
 	}
 	
-	@GetMapping("/v1/{appointmentId}")
+	@GetMapping("/{appointmentId}")
 	public ResponseEntity<Appointment> getAppointment(@PathVariable String appointmentId) {
 	    Appointment appointment = appointmentService.getAppointment(appointmentId);
 	    if (appointment == null) {
