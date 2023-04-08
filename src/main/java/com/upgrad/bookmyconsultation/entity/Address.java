@@ -1,17 +1,19 @@
 package com.upgrad.bookmyconsultation.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
 @NoArgsConstructor
 public class Address {
 	@Id
-	private String id;
+	private String id = UUID.randomUUID().toString();
 	private String addressLine1;
 	private String addressLine2;
 	private String city;

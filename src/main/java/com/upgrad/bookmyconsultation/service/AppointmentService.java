@@ -1,50 +1,70 @@
 package com.upgrad.bookmyconsultation.service;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.upgrad.bookmyconsultation.dto.BookMyConsultaionResponse;
 import com.upgrad.bookmyconsultation.entity.Appointment;
 import com.upgrad.bookmyconsultation.exception.InvalidInputException;
 import com.upgrad.bookmyconsultation.exception.ResourceUnAvailableException;
 import com.upgrad.bookmyconsultation.exception.SlotUnavailableException;
 import com.upgrad.bookmyconsultation.repository.AppointmentRepository;
+import com.upgrad.bookmyconsultation.repository.DoctorRepository;
 import com.upgrad.bookmyconsultation.repository.UserRepository;
 import com.upgrad.bookmyconsultation.util.ValidationUtils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class AppointmentService {
 
+	@Autowired
+	AppointmentRepository appointmentRepository;
 	
-	
-	//mark it autowired
-	//create an instance of AppointmentRepository called appointmentRepository
+	@Autowired
+	DoctorRepository doctorRepository;
 
 	@Autowired
 	private UserRepository userRepository;
 
+	public Appointment bookAppointment(Appointment appointment) throws SlotUnavailableException, InvalidInputException {
+		// Validate appointment details
+		ValidationUtils.validate(appointment);
 
-	//create a method name appointment with the return type of String and parameter of type Appointment
-	//declare exceptions 'SlotUnavailableException' and 'InvalidInputException'
-		//validate the appointment details using the validate method from ValidationUtils class
-		//find if an appointment exists with the same doctor for the same date and time
-		//if the appointment exists throw the SlotUnavailableException
-		//save the appointment details to the database
-		//return the appointment id
-	
-	
+		if(!userRepository.checkUserIsExistsOrNot(appointment.getUserId())) {
+			throw new InvalidInputException("User is not available with the userId :"+appointment.getUserId());
+		}
+		
+		if(!doctorRepository.checkUserIsExistsOrNot(appointment.getDoctorId())) {
+			throw new InvalidInputException("Doctor is not available with the doctorId :"+appointment.getDoctorId());
+		}
+		
+		if (appointmentRepository.checkUserExistsByDoctorIdAndAppointmentDateAndTimeSlot(appointment.getUserId(),
+				appointment.getAppointmentDate(), appointment.getTimeSlot())) {
+			throw new SlotUnavailableException("User is having another appointment for the same timeslot");
+		}
+		
+		// Check if appointment slot is available
+		if (appointmentRepository.checkDoctorExistsByDoctorIdAndAppointmentDateAndTimeSlot(appointment.getDoctorId(),
+				appointment.getAppointmentDate(), appointment.getTimeSlot())) {
+			throw new SlotUnavailableException("Appointment slot is not available for the selected doctor");
+		}
 
+		// Save the appointment details to the database
+		Appointment appointmentObj = appointmentRepository.save(appointment);
+		return Appointment.builder().appointmentId(appointmentObj.getAppointmentId()).build();
+	}
 
-	//create a method getAppointment of type Appointment with a parameter name appointmentId of type String
-		//Use the appointmentid to get the appointment details
-		//if the appointment exists return the appointment
-		//else throw ResourceUnAvailableException
-		//tip: use Optional.ofNullable(). Use orElseThrow() method when Optional.ofNullable() throws NULL
-	
+	public Appointment getAppointment(String appointmentId) {
+		Optional<Appointment> optionalAppointment = appointmentRepository.findById(appointmentId);
+		return optionalAppointment.orElseThrow(() -> new ResourceUnAvailableException("Appointment not found"));
+	}
+
 	public List<Appointment> getAppointmentsForUser(String userId) {
 		return appointmentRepository.findByUserId(userId);
 	}
+
 }

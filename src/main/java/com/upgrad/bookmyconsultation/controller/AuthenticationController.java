@@ -8,6 +8,7 @@
  */
 package com.upgrad.bookmyconsultation.controller;
 
+import com.upgrad.bookmyconsultation.entity.User;
 import com.upgrad.bookmyconsultation.exception.ApplicationException;
 import com.upgrad.bookmyconsultation.model.AuthorizedUser;
 import com.upgrad.bookmyconsultation.provider.BasicAuthDecoder;
@@ -38,7 +39,7 @@ public class AuthenticationController {
 		final AuthorizedUser authorizedUser = authenticationService.authenticate(basicAuthDecoder.getEmail(), basicAuthDecoder.getPassword());
 		return ResponseEntity.status(HttpStatus.OK).body(authorizedUser);
 	}
-
+	
 	@PostMapping(path = "/logout")
 	public void logout(@RequestHeader final String authorization) throws ApplicationException {
 		final BearerAuthDecoder authDecoder = new BearerAuthDecoder(authorization);

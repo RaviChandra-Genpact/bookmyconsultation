@@ -1,21 +1,24 @@
 package com.upgrad.bookmyconsultation.util;
 
-import com.upgrad.bookmyconsultation.entity.Appointment;
-import com.upgrad.bookmyconsultation.entity.Doctor;
-import com.upgrad.bookmyconsultation.entity.User;
-import com.upgrad.bookmyconsultation.exception.InvalidInputException;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+
+import com.upgrad.bookmyconsultation.entity.Appointment;
+import com.upgrad.bookmyconsultation.entity.Doctor;
+import com.upgrad.bookmyconsultation.entity.User;
+import com.upgrad.bookmyconsultation.exception.InvalidInputException;
 
 @Component
 public class ValidationUtils {
 
+	private static DateFormat sdf;
 	public static void validate(User user) throws InvalidInputException {
 		List<String> errorFields = new ArrayList<>();
 		if (user.getEmailId() == null || !user.getEmailId().matches("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")) {
@@ -32,7 +35,7 @@ public class ValidationUtils {
 		if (user.getLastName() == null || !user.getLastName().matches("^[a-zA-Z\\\\s]{1,10}$")) {
 			errorFields.add("Last Name");
 		}
-		if (errorFields.size() > 0) throw new InvalidInputException(errorFields);
+		if (errorFields.size() > 0) throw new InvalidInputException(errorFields.stream().map(s -> String.join(",", s )).toString());
 	}
 
 	public static void validate(Doctor doctor) throws InvalidInputException {
@@ -55,7 +58,7 @@ public class ValidationUtils {
 		if (doctor.getEmailId() == null || !doctor.getEmailId().matches("^[a-zA-Z0-9_!#$%&’*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$")) {
 			errorFields.add("Email Id");
 		}
-		if (errorFields.size() > 0) throw new InvalidInputException(errorFields);
+		if (errorFields.size() > 0) throw new InvalidInputException(errorFields.stream().map(s -> String.join(",", s )).toString());
 	}
 
 	public static void validate(Appointment appointment) throws InvalidInputException {
@@ -71,18 +74,32 @@ public class ValidationUtils {
 		if (StringUtils.isEmpty(appointment.getTimeSlot())) {
 			errorFields.add("Time slot");
 		}
-		if (appointment.getAppointmentDate() == null || !isValid(appointment.getAppointmentDate())) {
+		if (appointment.getAppointmentDate() == null || !isValidFutureDate(appointment.getAppointmentDate())) {
 			errorFields.add("AppointmentDate");
 		}
 
-		if (errorFields.size() > 0) throw new InvalidInputException(errorFields);
+		if (errorFields.size() > 0) throw new InvalidInputException(errorFields.stream().map(s -> String.join(",", s )).toString());
 	}
 
 	public static boolean isValid(String dateStr) {
-		DateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		sdf = new SimpleDateFormat("yyyy-MM-dd");
 		sdf.setLenient(false);
 		try {
 			sdf.parse(dateStr);
+		} catch (ParseException e) {
+			return false;
+		}
+		return true;
+	}
+	
+	public static boolean isValidFutureDate(String dateStr) {
+		try {
+			if(isValid(dateStr)) {
+			Date date = sdf.parse(dateStr);
+			if (date.before(new Date())) {
+				return false;
+			}
+			}
 		} catch (ParseException e) {
 			return false;
 		}

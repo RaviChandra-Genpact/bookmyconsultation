@@ -1,21 +1,22 @@
 package com.upgrad.bookmyconsultation.entity;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.upgrad.bookmyconsultation.enums.Speciality;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
-import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.upgrad.bookmyconsultation.enums.Speciality;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
@@ -41,5 +42,6 @@ public class Doctor {
 	private String college;
 	private Integer totalYearsOfExp;
 	private Double rating;
+	private int numberOfRatings;
 
 }
