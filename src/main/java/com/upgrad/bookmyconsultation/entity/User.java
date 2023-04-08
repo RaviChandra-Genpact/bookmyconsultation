@@ -1,8 +1,5 @@
 package com.upgrad.bookmyconsultation.entity;
 
-import java.util.UUID;
-
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -22,10 +19,7 @@ import lombok.NoArgsConstructor;
 @JsonInclude(value = Include.NON_NULL)
 public class User {
 	@Id
-	private String userId = UUID.randomUUID().toString();    
-    @Column(unique = true)
     private String emailId;
-    
     private String firstName;
     private String lastName;
     private String dob;

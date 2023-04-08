@@ -14,10 +14,10 @@ public interface UserRepository extends CrudRepository<User, String> {
 	@Override
 	List<User> findAll();
 
-	@Query("SELECT u FROM User u WHERE u.emailId = :emailId")
-	User findByEmailId(String emailId);
+//	@Query("SELECT u FROM User u WHERE u.emailId = :emailId")
+//	User findByEmailId(String emailId);
 	
-	@Query("SELECT COUNT(u) > 0 FROM User u WHERE u.userId = :userId")
-	boolean checkUserIsExistsOrNot(String userId);
+	@Query("SELECT COUNT(u) > 0 FROM User u WHERE u.emailId = :emailId")
+	boolean checkUserIsExistsOrNot(String emailId);
 
 }

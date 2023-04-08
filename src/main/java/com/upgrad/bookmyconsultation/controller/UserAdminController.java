@@ -34,12 +34,12 @@ public class UserAdminController {
 		return ResponseEntity.ok(User);
 	}
 
-	@PostMapping("/add")
+	@PostMapping("/register")
 	public ResponseEntity<?> createUser(@RequestBody User user) throws InvalidInputException {
 		if (Objects.isNull(user)) {
 			throw new InvalidInputException("Invalid request body");
 		}
-		return ResponseEntity.ok(User.builder().userId(userService.register(user).getUserId()).build());
+		return ResponseEntity.ok(User.builder().emailId(userService.register(user).getEmailId()).build());
 	}
 
 	@GetMapping("/{userId}/appointments")
