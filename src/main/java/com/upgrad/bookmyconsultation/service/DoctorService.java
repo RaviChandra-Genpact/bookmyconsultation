@@ -1,5 +1,13 @@
 package com.upgrad.bookmyconsultation.service;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.upgrad.bookmyconsultation.entity.Address;
 import com.upgrad.bookmyconsultation.entity.Doctor;
 import com.upgrad.bookmyconsultation.enums.Speciality;
@@ -9,17 +17,9 @@ import com.upgrad.bookmyconsultation.model.TimeSlot;
 import com.upgrad.bookmyconsultation.repository.AddressRepository;
 import com.upgrad.bookmyconsultation.repository.AppointmentRepository;
 import com.upgrad.bookmyconsultation.repository.DoctorRepository;
-import com.upgrad.bookmyconsultation.util.ValidationUtils;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import springfox.documentation.annotations.Cacheable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import lombok.extern.log4j.Log4j2;
+import springfox.documentation.annotations.Cacheable;
 
 @Log4j2
 @Service
@@ -31,25 +31,40 @@ public class DoctorService {
 	@Autowired
 	private AddressRepository addressRepository;
 
+	public Doctor register(Doctor doctor) throws InvalidInputException {
+		// Validate doctor details
+		if (doctorRepository.existsByMobileAndEmailId(doctor.getMobile(), doctor.getEmailId())) {
+			throw new InvalidInputException(
+					"Doctor already exist with the mobile :" + doctor.getMobile() + " email:" + doctor.getEmailId());
+		}
+		if (!Speciality.contains(doctor.getSpeciality().name())) {
+			throw new InvalidInputException("Invalid Speciality :" + doctor.getSpeciality());
+		}
+
+		if (doctor.getAddress() == null) {
+			System.out.println("doctor address obj is null");
+			throw new InvalidInputException("Doctor address is required");
+		}
+		// Set UUID for doctor
+		doctor.setId(UUID.randomUUID().toString());
+
+		// Set default speciality if not provided
+		if (doctor.getSpeciality() == null) {
+			doctor.setSpeciality(Speciality.GENERAL_PHYSICIAN);
+		}
+		// Create and save address object
+		Address address = doctor.getAddress();
+		address.setId(UUID.randomUUID().toString());
+		addressRepository.save(address);
+		// Set address in doctor object
+		doctor.setAddress(address);
+		return doctorRepository.save(doctor);
+	}
 	
-	//create a method register with return type and parameter of typeDoctor
-	//declare InvalidInputException for the method
-		//validate the doctor details
-		//if address is null throw InvalidInputException
-		//set UUID for doctor using UUID.randomUUID.
-		//if speciality is null 
-			//set speciality to Speciality.GENERAL_PHYSICIAN
-		//Create an Address object, initialise it with address details from the doctor object
-		//Save the address object to the database. Store the response.
-		//Set the address in the doctor object with the response
-		//save the doctor object to the database
-		//return the doctor object
-	
-	
-	//create a method name getDoctor that returns object of type Doctor and has a String paramter called id
-		//find the doctor by id
-		//if doctor is found return the doctor
-		//else throw ResourceUnAvailableException
+	public Doctor getDoctor(String id) {
+	    return doctorRepository.findById(id)
+	        .orElseThrow(() -> new ResourceUnAvailableException("Doctor not found"));
+	}
 
 	
 
@@ -73,6 +88,7 @@ public class DoctorService {
 	public TimeSlot getTimeSlots(String doctorId, String date) {
 
 		TimeSlot timeSlot = new TimeSlot(doctorId, date);
+		System.out.println("timeSlot : "+timeSlot);
 		timeSlot.setTimeSlot(timeSlot.getTimeSlot()
 				.stream()
 				.filter(slot -> {

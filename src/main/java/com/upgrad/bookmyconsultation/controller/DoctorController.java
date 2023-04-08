@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.InvalidParameterException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,8 +40,11 @@ public class DoctorController {
 		return ResponseEntity.ok(service.getAllDoctorsWithFilters(speciality));
 	}
 
-	@PostMapping
+	@PostMapping("/add")
 	public ResponseEntity<Doctor> registerDoctor(@RequestBody Doctor doctor) throws InvalidInputException {
+		if(Objects.isNull(doctor)) {
+			 throw new InvalidInputException("Doctor object is required");
+		}
 		return ResponseEntity.ok(service.register(doctor));
 	}
 
@@ -50,11 +55,11 @@ public class DoctorController {
 				.map(Enum::name)
 				.collect(Collectors.toList()));
 	}
-
+	
 	@GetMapping("/{doctorId}/timeSlots")
 	public ResponseEntity<TimeSlot> getTimeSlots(@RequestParam(value = "date", required = false) String date,
 	                                             @PathVariable String doctorId) {
-		if (!ValidationUtils.isValid(date)) {
+		if (!ValidationUtils.isValidFutureDate(date)) {
 			throw new InvalidParameterException("Not a valid date");
 		}
 

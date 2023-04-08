@@ -1,13 +1,14 @@
 package com.upgrad.bookmyconsultation.config;
 
-import com.upgrad.bookmyconsultation.servlet.AuthFilter;
-import com.upgrad.bookmyconsultation.servlet.CorsFilter;
-import com.upgrad.bookmyconsultation.servlet.RequestContextFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+
+import com.upgrad.bookmyconsultation.servlet.AuthFilter;
+import com.upgrad.bookmyconsultation.servlet.CorsFilter;
+import com.upgrad.bookmyconsultation.servlet.RequestContextFilter;
 
 @Configuration
 @ComponentScan("com.upgrad.bookmyconsultation.controller")

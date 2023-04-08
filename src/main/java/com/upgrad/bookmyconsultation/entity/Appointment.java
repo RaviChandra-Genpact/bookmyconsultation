@@ -32,5 +32,4 @@ public class Appointment {
 	private String createdDate;
 	private String symptoms;
 	private String priorMedicalHistory;
-
 }

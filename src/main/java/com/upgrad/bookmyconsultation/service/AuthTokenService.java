@@ -28,9 +28,6 @@ import java.time.ZonedDateTime;
 public class AuthTokenService {
 
 	@Autowired
-	private UserRepository userRepository;
-
-	@Autowired
 	private UserAuthTokenRepository userAuthDao;
 
 
